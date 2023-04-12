@@ -22,3 +22,10 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
+
+// Delete password field on user documents
+UserSchema.methods.toJSON = function () {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
