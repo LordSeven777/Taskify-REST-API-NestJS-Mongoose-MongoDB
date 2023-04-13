@@ -18,6 +18,7 @@ import { UserDocument } from '../user/user.schema';
 import { AccessTokenGuard, RefreshTokenGuard } from './guards';
 import { Response } from 'express';
 import { REFRESH_TOKEN_COOKIE_NAME } from './auth.constants';
+import { UserService } from '../user/user.service';
 
 const refreshTokenCookieOptions: CookieOptions = {
   secure: true,
@@ -26,7 +27,10 @@ const refreshTokenCookieOptions: CookieOptions = {
 
 @Controller('api/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+  ) {}
 
   @Post('register')
   async register(
@@ -73,5 +77,15 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
+  }
+
+  @Delete('unregister')
+  @UseGuards(AccessTokenGuard)
+  async unregister(
+    @AuthUser() authUser: UserDocument,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
+    return this.userService.delete(authUser);
   }
 }
