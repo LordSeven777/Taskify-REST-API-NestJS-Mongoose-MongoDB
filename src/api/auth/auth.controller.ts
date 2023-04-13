@@ -1,4 +1,14 @@
-import { Controller, Post, Body, Get, UseGuards, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  UseGuards,
+  Res,
+  Delete,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
 import { CookieOptions } from 'express';
 
 import { AuthService } from './auth.service';
@@ -56,5 +66,12 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   async refreshToken(@AuthUser() authUser: UserDocument) {
     return this.authService.refreshToken(authUser);
+  }
+
+  @Delete('logout')
+  @UseGuards(AccessTokenGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
   }
 }
