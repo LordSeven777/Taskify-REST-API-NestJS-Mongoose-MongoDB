@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 
 import type { TokenType, UserJwtPayload, AuthResult } from './auth';
 import { RegisterUserDTO, LoginDTO } from './dto';
-import { User } from '../user/user.schema';
+import { User, UserDocument } from '../user/user.schema';
 
 @Injectable()
 export class AuthService {
@@ -70,6 +70,16 @@ export class AuthService {
       user,
       accessToken,
       refreshToken,
+    };
+  }
+
+  async refreshToken(user: UserDocument) {
+    const token = await this.generateToken('ACCESS', {
+      sub: user.id,
+      username: user.username,
+    });
+    return {
+      accessToken: token,
     };
   }
 }
