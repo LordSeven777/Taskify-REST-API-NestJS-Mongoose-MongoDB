@@ -10,7 +10,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // CORS handling
-  app.enableCors();
+  app.enableCors({
+    optionsSuccessStatus: 200,
+    credentials: true,
+  });
 
   // Global pipe for the DTO validations
   app.useGlobalPipes(
