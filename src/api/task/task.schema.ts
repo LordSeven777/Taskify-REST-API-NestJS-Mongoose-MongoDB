@@ -23,7 +23,7 @@ export class Task {
       default: [],
     },
   ])
-  checklist: string[];
+  checkList: string[];
 
   @Prop({
     type: Date,
@@ -53,13 +53,11 @@ export class Task {
   ])
   labels: Label[];
 
-  @Prop([
-    {
-      type: MongooseSchema.Types.ObjectId,
-      required: true,
-      ref: 'User',
-    },
-  ])
+  @Prop({
+    type: MongooseSchema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  })
   user: User;
 }
 
