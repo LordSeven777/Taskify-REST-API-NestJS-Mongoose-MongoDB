@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId } from 'mongoose';
+import { FilterQuery, Model, ObjectId } from 'mongoose';
 
 import { User, UserDocument } from './user.schema';
 import { QueryParams } from 'src/common/types/query';
 import { getDateEdgeTimes } from 'src/common/utils/date-time.utils';
-import { LabelDocument } from '../label/label.schema';
+import { Label, LabelDocument } from '../label/label.schema';
 import { Task } from '../task/task.schema';
 
 @Injectable()
@@ -13,6 +13,7 @@ export class UserService {
   constructor(
     @InjectModel('User') private userModel: Model<User>,
     @InjectModel('Task') private taskModel: Model<Task>,
+    @InjectModel('Label') private labelModel: Model<Label>,
   ) {}
 
   async getOne(identifier: string) {
@@ -50,6 +51,14 @@ export class UserService {
       .select('-description -checkList')
       .populate<{ labels: LabelDocument[] }>('labels');
     return tasks;
+  }
+
+  async getLabels(userId: ObjectId | string, params: QueryParams) {
+    const query: FilterQuery<Label> = {
+      user: userId,
+    };
+    if (params.search) query.name = new RegExp(params.search, 'i');
+    return await this.labelModel.find(query);
   }
 
   async delete(user: UserDocument) {

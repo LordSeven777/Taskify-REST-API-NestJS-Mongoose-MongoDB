@@ -15,4 +15,15 @@ export class UserController {
   ) {
     return this.userService.getTasks(params.id, query);
   }
+
+  @Get(':id/labels')
+  @MatchesUserParam
+  async getLabels(
+    @Param() params: { id: string },
+    @Query() query: { q?: string },
+  ) {
+    return this.userService.getLabels(params.id, {
+      search: query.q,
+    });
+  }
 }
