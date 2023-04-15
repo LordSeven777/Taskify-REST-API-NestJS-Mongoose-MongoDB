@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 
 import { CreateLabelDTO } from './create-label.dto';
@@ -9,12 +13,15 @@ import { InjectModel } from '@nestjs/mongoose';
 export class LabelService {
   constructor(@InjectModel('Label') private labelModel: Model<Label>) {}
 
-  async existsForUser(
-    userId: Types.ObjectId | string,
-    name: string,
-  ): Promise<boolean> {
-    const label = await this.labelModel.findOne({ name, user: userId });
-    return label !== null;
+  async getOne(id: Types.ObjectId | string) {
+    const label = await this.labelModel.findById(id);
+    if (!label) {
+      throw new NotFoundException('Label not found', {
+        description:
+          'The label specified in the request id parameter is not found',
+      });
+    }
+    return label;
   }
 
   async create(userId: Types.ObjectId | string, payload: CreateLabelDTO) {
@@ -29,5 +36,13 @@ export class LabelService {
       user: userId,
     });
     return label;
+  }
+
+  async existsForUser(
+    userId: Types.ObjectId | string,
+    name: string,
+  ): Promise<boolean> {
+    const label = await this.labelModel.findOne({ name, user: userId });
+    return label !== null;
   }
 }
