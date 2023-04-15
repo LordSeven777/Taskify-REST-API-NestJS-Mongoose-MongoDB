@@ -6,7 +6,7 @@ import { User } from '../user/user.schema';
 
 export type TaskDocument = HydratedDocument<Task>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Task {
   @Prop({
     type: String,

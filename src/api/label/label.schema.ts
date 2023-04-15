@@ -5,7 +5,7 @@ import { User } from '../user/user.schema';
 
 export type LabelDocument = HydratedDocument<Label>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class Label {
   @Prop({
     type: String,
