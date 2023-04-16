@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { Model, Types } from 'mongoose';
 
-import { CreateLabelDTO } from './create-label.dto';
-import { Label } from './label.schema';
+import { CreateLabelDTO, UpdateLabelDTO } from './dto';
+import { Label, LabelDocument } from './label.schema';
 import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
@@ -35,6 +35,13 @@ export class LabelService {
       color: payload.color,
       user: userId,
     });
+    return label;
+  }
+
+  async update(label: LabelDocument, payload: UpdateLabelDTO) {
+    if (payload?.name) label.name = payload.name;
+    if (payload?.color) label.color = payload.color;
+    await label.save();
     return label;
   }
 
