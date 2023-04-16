@@ -45,6 +45,11 @@ export class LabelService {
     return label;
   }
 
+  async delete(label: LabelDocument) {
+    await label.deleteOne();
+    return label;
+  }
+
   async existsForUser(
     userId: Types.ObjectId | string,
     name: string,

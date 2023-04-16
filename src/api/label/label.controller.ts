@@ -1,4 +1,12 @@
-import { Body, Controller, Param, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 
 import { BindLabelParamPipe } from './pipe';
 import { AccessTokenGuard } from '../auth/guards';
@@ -28,5 +36,11 @@ export class LabelController {
     @Body() payload: UpdateLabelDTO,
   ) {
     return this.labelService.update(label, payload);
+  }
+
+  @Delete(':id')
+  @UseGuards(AccessTokenGuard)
+  async delete(@Param('id', BindLabelParamPipe) label: LabelDocument) {
+    return this.labelService.delete(label);
   }
 }
