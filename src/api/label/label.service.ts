@@ -57,4 +57,28 @@ export class LabelService {
     const label = await this.labelModel.findOne({ name, user: userId });
     return label !== null;
   }
+
+  async exist(ids: (Types.ObjectId | string)[]): Promise<boolean> {
+    const _ids = [...new Set(ids)];
+    const count = await this.labelModel.countDocuments({
+      _id: {
+        $in: _ids,
+      },
+    });
+    return count === _ids.length;
+  }
+
+  async existForUser(
+    ids: (Types.ObjectId | string)[],
+    userId: Types.ObjectId | string,
+  ) {
+    const _ids = [...new Set(ids)];
+    const count = await this.labelModel.countDocuments({
+      _id: {
+        $in: _ids,
+      },
+      user: userId,
+    });
+    return count === _ids.length;
+  }
 }
