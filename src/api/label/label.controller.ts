@@ -12,16 +12,22 @@ import { BindLabelParamPipe } from './pipe';
 import { AccessTokenGuard } from '../auth/guards';
 import { LabelService } from './label.service';
 import { CreateLabelDTO, UpdateLabelDTO } from './dto';
-import { AuthUser } from '../auth/decorator';
+import { AuthUser, ApplyPolicy } from '../auth/decorator';
 import { UserDocument } from '../user/user.schema';
 import { LabelDocument } from './label.schema';
+import { LabelPolicy } from './label.policy';
+import { UserAction } from '../auth/auth.policy';
 
 @Controller('api/labels')
 export class LabelController {
-  constructor(private labelService: LabelService) {}
+  constructor(
+    private labelService: LabelService,
+    private labelPolicy: LabelPolicy,
+  ) {}
 
   @Post('')
   @UseGuards(AccessTokenGuard)
+  @ApplyPolicy(LabelPolicy, UserAction.Create)
   async create(
     @Body() payload: CreateLabelDTO,
     @AuthUser() authUser: UserDocument,
@@ -32,15 +38,21 @@ export class LabelController {
   @Put(':id')
   @UseGuards(AccessTokenGuard)
   async update(
-    @Param('id', BindLabelParamPipe) label: LabelDocument,
     @Body() payload: UpdateLabelDTO,
+    @Param('id', BindLabelParamPipe) label: LabelDocument,
+    @AuthUser() authUser: UserDocument,
   ) {
+    this.labelPolicy.authorize(authUser, UserAction.Update, label);
     return this.labelService.update(label, payload);
   }
 
   @Delete(':id')
   @UseGuards(AccessTokenGuard)
-  async delete(@Param('id', BindLabelParamPipe) label: LabelDocument) {
+  async delete(
+    @Param('id', BindLabelParamPipe) label: LabelDocument,
+    @AuthUser() authUser: UserDocument,
+  ) {
+    this.labelPolicy.authorize(authUser, UserAction.Delete, label);
     return this.labelService.delete(label);
   }
 }
