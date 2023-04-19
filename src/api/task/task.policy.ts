@@ -22,6 +22,14 @@ export type TaskSubject = InferSubjects<typeof Task>;
 export class TaskPolicy extends PolicyDefinition<Task, TaskSubject> {
   createAbilityForUser(user: UserDocument) {
     const { can, build } = new AbilityBuilder(createMongoAbility);
+    can(UserAction.Read, Task, undefined, {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      'user.id': user.id,
+    });
+    can(UserAction.Read, Task, {
+      user: user.id,
+    });
     can(UserAction.Create, Task);
     can([UserAction.Update, UserAction.Delete], Task, {
       user: user.id,
@@ -44,6 +52,7 @@ export class TaskPolicy extends PolicyDefinition<Task, TaskSubject> {
           .setMessage('You do not have permissions for adding a task')
           .throwUnlessCan(UserAction.Create, Task);
         break;
+      case UserAction.Read:
       case UserAction.Update:
       case UserAction.Delete:
         ForbiddenError.from(ability)
