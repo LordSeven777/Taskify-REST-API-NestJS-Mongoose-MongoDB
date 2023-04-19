@@ -6,6 +6,7 @@ import { TaskService } from './task.service';
 import { TaskController } from './task.controller';
 import { LabelsExist } from './validator';
 import { LabelModule } from '../label/label.module';
+import { TaskPolicy } from './task.policy';
 
 const taskMongooseModule = MongooseModule.forFeature([
   { name: Task.name, schema: TaskSchema },
@@ -13,7 +14,7 @@ const taskMongooseModule = MongooseModule.forFeature([
 
 @Module({
   imports: [taskMongooseModule, LabelModule],
-  providers: [TaskService, LabelsExist],
+  providers: [TaskService, LabelsExist, TaskPolicy],
   exports: [taskMongooseModule, TaskService],
   controllers: [TaskController],
 })
