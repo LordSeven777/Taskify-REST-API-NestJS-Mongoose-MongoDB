@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Schema as MongooseSchema } from 'mongoose';
+import { HydratedDocument, Schema as MongooseSchema, Types } from 'mongoose';
 
 import { Label } from '../label/label.schema';
 import { User } from '../user/user.schema';
@@ -51,14 +51,14 @@ export class Task {
       ref: 'Label',
     },
   ])
-  labels: Label[];
+  labels: Label[] | Types.ObjectId[];
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
     required: true,
     ref: 'User',
   })
-  user: User;
+  user: User | Types.ObjectId;
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
