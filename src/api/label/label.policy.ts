@@ -17,6 +17,7 @@ type LabelSubject = InferSubjects<typeof Label>;
 export class LabelPolicy extends PolicyDefinition<Label, LabelSubject> {
   createAbilityForUser(user: UserDocument) {
     const { can, build } = new AbilityBuilder(createMongoAbility);
+    can(UserAction.Create, Label);
     can([UserAction.Update, UserAction.Delete], Label, {
       user: user.id,
     });
@@ -34,7 +35,10 @@ export class LabelPolicy extends PolicyDefinition<Label, LabelSubject> {
   ) {
     switch (action) {
       case UserAction.Create:
-        return false;
+        ForbiddenError.from(ability)
+          .setMessage('You do not have permissions for creating a label')
+          .throwUnlessCan(action, Label);
+        break;
       case UserAction.Update:
       case UserAction.Delete:
         ForbiddenError.from(ability)
