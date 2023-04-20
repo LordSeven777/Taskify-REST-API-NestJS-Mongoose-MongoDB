@@ -29,13 +29,13 @@ export class Task {
     type: Date,
     required: true,
   })
-  startsAt: Date;
+  startsAt: Date | string;
 
   @Prop({
     type: Date,
     required: true,
   })
-  endsAt: Date;
+  endsAt: Date | string;
 
   @Prop({
     type: Boolean,
@@ -51,14 +51,14 @@ export class Task {
       ref: 'Label',
     },
   ])
-  labels: Label[] | Types.ObjectId[];
+  labels: Label[] | Types.ObjectId[] | string[];
 
   @Prop({
     type: MongooseSchema.Types.ObjectId,
     required: true,
     ref: 'User',
   })
-  user: User | Types.ObjectId;
+  user: User | Types.ObjectId | string[];
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
