@@ -66,9 +66,14 @@ export class TaskService {
         );
       }
     }
-    await task.updateOne({
-      $set: payload,
-    });
+    payload.name && (task.name = payload.name);
+    payload.description && (task.description = payload.description);
+    payload.checkList && (task.checkList = payload.checkList);
+    payload.startsAt && (task.startsAt = payload.startsAt);
+    payload.endsAt && (task.endsAt = payload.endsAt);
+    payload.isCompleted && (task.isCompleted = payload.isCompleted);
+    payload.labels && (task.labels = payload.labels);
+    await task.save();
     return task.populate<{ user: UserDocument; labels: LabelDocument[] }>([
       'user',
       'labels',
