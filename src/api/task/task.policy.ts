@@ -1,6 +1,5 @@
 import {
   AbilityBuilder,
-  ExtractSubjectType,
   ForbiddenError,
   InferSubjects,
   createMongoAbility,
@@ -22,22 +21,18 @@ export type TaskSubject = InferSubjects<typeof Task>;
 export class TaskPolicy extends PolicyDefinition<Task, TaskSubject> {
   createAbilityForUser(user: UserDocument) {
     const { can, build } = new AbilityBuilder(createMongoAbility);
-    can(UserAction.Read, Task, undefined, {
+    const actions = [UserAction.Read, UserAction.Update, UserAction.Delete];
+    can(UserAction.Create, Task);
+    can(actions, Task, {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       'user.id': user.id,
     });
-    can(UserAction.Read, Task, {
-      user: user.id,
-    });
-    can(UserAction.Create, Task);
-    can([UserAction.Update, UserAction.Delete], Task, {
+    can(actions, Task, {
       user: user.id,
     });
     return build({
-      detectSubjectType(subject) {
-        return subject.constructor as ExtractSubjectType<TaskSubject>;
-      },
+      detectSubjectType: () => Task,
     }) as AppAbility<TaskSubject, Task>;
   }
 
@@ -46,24 +41,22 @@ export class TaskPolicy extends PolicyDefinition<Task, TaskSubject> {
     action: UserAction,
     task?: Task,
   ): boolean | void | ExceptionOptions {
+    let message: string;
     switch (action) {
       case UserAction.Create:
-        ForbiddenError.from(ability)
-          .setMessage('You do not have permissions for adding a task')
-          .throwUnlessCan(UserAction.Create, Task);
+        message = 'You do not have permissions for adding a task';
         break;
       case UserAction.Read:
       case UserAction.Update:
       case UserAction.Delete:
-        ForbiddenError.from(ability)
-          .setMessage(
-            `You should be the owner of the task in order to ${action} it`,
-          )
-          .throwUnlessCan(UserAction.Create, task);
+        message = `You should be the owner of the task in order to ${action} it`;
         break;
       default:
-        break;
+        throw new Error('Unsupported user action on task policy');
     }
+    ForbiddenError.from(ability)
+      .setMessage(message)
+      .throwUnlessCan(action, task ?? Task);
     return true;
   }
 }

@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
   AbilityBuilder,
-  ExtractSubjectType,
   ForbiddenError,
   InferSubjects,
   createMongoAbility,
@@ -22,9 +21,7 @@ export class LabelPolicy extends PolicyDefinition<Label, LabelSubject> {
       user: user.id,
     });
     return build({
-      detectSubjectType(subject) {
-        return subject.constructor as ExtractSubjectType<LabelSubject>;
-      },
+      detectSubjectType: () => Label,
     }) as AppAbility<LabelSubject, Label>;
   }
 
@@ -33,20 +30,21 @@ export class LabelPolicy extends PolicyDefinition<Label, LabelSubject> {
     action: UserAction,
     label?: Label,
   ) {
+    let message: string;
     switch (action) {
       case UserAction.Create:
-        ForbiddenError.from(ability)
-          .setMessage('You do not have permissions for creating a label')
-          .throwUnlessCan(action, Label);
+        message = 'You do not have permissions for creating a label';
         break;
       case UserAction.Update:
       case UserAction.Delete:
-        ForbiddenError.from(ability)
-          .setMessage('You are not the owner of the label')
-          .throwUnlessCan(action, label);
+        message = `You cannot ${action} the label are the owner of the label`;
         break;
       default:
-        return true;
+        throw new Error('Unsupported user action on label policy');
     }
+    ForbiddenError.from(ability)
+      .setMessage(message)
+      .throwUnlessCan(action, label ?? Label);
+    return true;
   }
 }
