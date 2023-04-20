@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Post,
@@ -55,5 +56,15 @@ export class TaskController {
   ) {
     this.taskPolicy.authorize(authUser, UserAction.Update, task);
     return this.taskService.update(task, payload);
+  }
+
+  @Delete(':id')
+  @UseGuards(AccessTokenGuard)
+  async delete(
+    @Param('id', BindTaskParamPipe) task: TaskDocument,
+    @AuthUser() authUser: UserDocument,
+  ) {
+    this.taskPolicy.authorize(authUser, UserAction.Delete, task);
+    return this.taskService.delete(task);
   }
 }

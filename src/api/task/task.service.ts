@@ -79,4 +79,9 @@ export class TaskService {
       'labels',
     ]);
   }
+
+  async delete(task: TaskDocument) {
+    await task.deleteOne();
+    return task;
+  }
 }
