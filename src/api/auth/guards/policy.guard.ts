@@ -18,9 +18,10 @@ export class PolicyGuard implements CanActivate {
   canActivate(
     ctx: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const policyConstraints = this.reflector.get<
-      [PolicyDefinitionConstructor<PolicyDefinition>, UserAction][]
-    >(CHECK_POLICIES_KEY, ctx.getHandler());
+    const policyConstraints =
+      this.reflector.get<
+        [PolicyDefinitionConstructor<PolicyDefinition>, UserAction][]
+      >(CHECK_POLICIES_KEY, ctx.getHandler()) ?? [];
     const user = ctx.switchToHttp().getRequest() as UserDocument;
     return policyConstraints.every(([Policy, action]) => {
       const policy = new Policy();
