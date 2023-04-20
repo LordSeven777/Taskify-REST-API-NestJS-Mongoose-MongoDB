@@ -1,8 +1,16 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+  UseGuards,
+} from '@nestjs/common';
 
 import { TaskService } from './task.service';
 import { AccessTokenGuard, PolicyGuard } from '../auth/guards';
-import { CreateTaskDTO } from './dto';
+import { CreateTaskDTO, UpdateTaskDTO } from './dto';
 import { TaskPolicy } from './task.policy';
 import { UserDocument } from '../user/user.schema';
 import { UserAction } from '../auth/auth.policy';
@@ -36,5 +44,16 @@ export class TaskController {
     @AuthUser() authUser: UserDocument,
   ) {
     return this.taskService.create(payload, authUser.id);
+  }
+
+  @Put(':id')
+  @UseGuards(AccessTokenGuard)
+  async update(
+    @Param('id', BindTaskParamPipe) task: TaskDocument,
+    @Body() payload: UpdateTaskDTO,
+    @AuthUser() authUser: UserDocument,
+  ) {
+    this.taskPolicy.authorize(authUser, UserAction.Update, task);
+    return this.taskService.update(task, payload);
   }
 }
