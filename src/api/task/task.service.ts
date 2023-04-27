@@ -71,7 +71,8 @@ export class TaskService {
     payload.checkList && (task.checkList = payload.checkList);
     payload.startsAt && (task.startsAt = payload.startsAt);
     payload.endsAt && (task.endsAt = payload.endsAt);
-    payload.isCompleted && (task.isCompleted = payload.isCompleted);
+    payload.isCompleted !== undefined &&
+      (task.isCompleted = payload.isCompleted);
     payload.labels && (task.labels = payload.labels);
     await task.save();
     return task.populate<{ user: UserDocument; labels: LabelDocument[] }>([
