@@ -24,7 +24,10 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+This is the REST API backend for the Taskify app that I built on this [repository](https://github.com/ToolTra/Taskify-Next.js). This shares the same database as my other Taskify application built on top of React and Node Typescript.
+
+## Live URL
+The deployed REST API of this application is live at the following URL: https://taskify-rest-api-nestjs.onrender.com
 
 ## Installation
 
